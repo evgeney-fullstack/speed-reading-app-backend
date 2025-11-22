@@ -20,11 +20,18 @@ type Server struct {
 
 // Returns an error in case of failure (for example, problems downloading certificates or a busy port).
 
-func (s *Server) Run(host, port string) error {
+// Run starts an HTTPS server with the specified host and port.
+
+// Uses pre-configured TLS certificates (cert.pem and key.pem).
+
+// Returns an error in case of failure (for example, problems downloading certificates or a busy port).
+func (s *Server) Run(host, port string, handler http.Handler) error {
 
 	s.httpServer = &http.Server{
 
 		Addr: host + ":" + port,
+
+		Handler: handler,
 
 		MaxHeaderBytes: 1 << 20,
 
