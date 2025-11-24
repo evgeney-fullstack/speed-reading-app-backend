@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  speed-reading-db:
+    image: postgres:15-alpine
+    container_name: speed-reading-postgres
+    environment:
+      - POSTGRES_USER=speed_reading_user
+      - POSTGRES_PASSWORD=12345
+      - POSTGRES_DB=speed_reading_db
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --lc-collate=C --lc-ctype=C
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U speed_reading_user -d speed_reading_db -h localhost",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - speed-reading-network
+
+networks:
+  speed-reading-network:
+    driver: bridge
+
+volumes:
+  pg_data:
+    driver: local
