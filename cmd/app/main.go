@@ -35,6 +35,11 @@ func main() {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
+	err = postgres.RunMigrations(db)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
 	// Initializing repositories for working with data
 	// repos provides access to PostgreSQL data
 	repos := postgres.NewRepository(db)
