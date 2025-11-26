@@ -13,10 +13,10 @@ CREATE TABLE reading_questions (
     text_id BIGINT NOT NULL REFERENCES reading_text packed(id) ON DELETE CASCADE,
     question TEXT NOT NULL,
     correct_answer TEXT NOT NULL,
-    option_1 TEXT NOT NULL,
-    option_2 TEXT NOT NULL,
-    option_3 TEXT NOT NULL,
-    option_4 TEXT NOT NULL,
+    answer_option_1 TEXT NOT NULL,
+    answer_option_2 TEXT NOT NULL,
+    answer_option_3 TEXT NOT NULL,
+    answer_option_4 TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
