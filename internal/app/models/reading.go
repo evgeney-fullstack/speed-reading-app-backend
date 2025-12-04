@@ -15,16 +15,12 @@ type ReadingText struct {
 
 // ReadingQuestion presents a question to the text
 type ReadingQuestion struct {
-	ID            int64     `json:"id" db:"id"`
-	TextID        int64     `json:"text_id" db:"text_id"`
-	Question      string    `json:"question" db:"question" binding:"required"`
-	CorrectAnswer string    `json:"correct_answer" db:"correct_answer" binding:"required"`
-	AnswerOption1 string    `json:"answer_option_1" db:"answer_option_1" binding:"required"`
-	AnswerOption2 string    `json:"answer_option_2" db:"answer_option_2" binding:"required"`
-	AnswerOption3 string    `json:"answer_option_3" db:"answer_option_3" binding:"required"`
-	AnswerOption4 string    `json:"answer_option_4" db:"answer_option_4" binding:"required"`
-	CreatedAt     time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at" db:"updated_at"`
+	ID        int64     `json:"id" db:"id"`
+	TextID    int64     `json:"text_id" db:"text_id"`
+	Question  string    `json:"question" db:"question" binding:"required"`
+	Answer    bool      `json:"answer" db:"answer" binding:"required"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
 // ReadingSessionResult represents the result of a reading session
