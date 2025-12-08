@@ -3,19 +3,22 @@ package handler
 import (
 	"github.com/evgeney-fullstack/speed-reading-app-backend/internal/app/service"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 // Handler handles HTTP requests and manages routing.
 // Contains dependencies required for request handlers (future fields).
 type Handler struct {
-	services *service.Service
+	services     *service.Service
+	errorHandler *ErrorHandler
 }
 
 // NewHandler creates and returns a new Handler instance.
 // Constructor function for initializing a handler with possible dependencies.
-func NewHandler(services *service.Service) *Handler {
+func NewHandler(services *service.Service, logger *logrus.Logger) *Handler {
 	return &Handler{
-		services: services,
+		services:     services,
+		errorHandler: NewErrorHandler(logger),
 	}
 
 }

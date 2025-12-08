@@ -13,13 +13,19 @@ import (
 )
 
 func main() {
+	// Initializing the logger
+	logger := logrus.New()
+
+	// Setting the logging level
+	logger.SetLevel(logrus.InfoLevel)
+
 	// Configuring the logs format in JSON for better structuring and compatibility
 	// with monitoring systems (Kibana, Elasticsearch, etc.)
-	logrus.SetFormatter(new(logrus.JSONFormatter))
+	logger.SetFormatter(new(logrus.JSONFormatter))
 
 	// Loading environment variables from the config.env file
 	if err := godotenv.Load("config.env"); err != nil {
-		logrus.Fatalf("error loading env variables: %s", err.Error())
+		logger.Fatalf("error loading env variables: %s", err.Error())
 	}
 
 	// Initializing a connection to PostgreSQL using parameters from environment variables
@@ -32,12 +38,12 @@ func main() {
 		SSLMode:  os.Getenv("POSTGRES_SSLMODE"),
 	})
 	if err != nil {
-		logrus.Fatalf("failed to initialize db: %s", err.Error())
+		logger.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
 	err = postgres.RunMigrations(db)
 	if err != nil {
-		logrus.Fatal(err)
+		logger.Fatal(err)
 	}
 
 	// Initializing repositories for working with data
@@ -50,7 +56,7 @@ func main() {
 
 	// Initialization of HTTP handlers with the introduction of a service layer
 	// Handlers will use business logic via service
-	handlers := handler.NewHandler(service)
+	handlers := handler.NewHandler(service, logger)
 
 	// Creating a server instance
 	srv := new(server.Server)
@@ -58,6 +64,6 @@ func main() {
 	// Launching an HTTPS server with configuration from environment variables
 	// Using HOST and HOST_PORT from config.env
 	if err := srv.Run(os.Getenv("HOST"), os.Getenv("HOST_PORT"), handlers.InitRoutes()); err != nil {
-		logrus.Fatalf("error occurred while running http server: %s", err.Error())
+		logger.Fatalf("error occurred while running http server: %s", err.Error())
 	}
 }
