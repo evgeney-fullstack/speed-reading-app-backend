@@ -40,12 +40,13 @@ func (r *TextRepository) InsertText(ctx context.Context, text models.ReadingText
 	}
 
 	// Build and execute SQL INSERT query
-	query := fmt.Sprintf("INSERT INTO %s (content, word_count, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING id", readingTextsTable)
+	query := fmt.Sprintf("INSERT INTO %s (content, word_count, questions, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id", readingTextsTable)
 
 	// Execute query and retrieve the auto-generated ID
 	err := r.db.QueryRowContext(ctx, query,
 		text.Content,
 		text.WordCount,
+		text.Questions,
 		text.CreatedAt,
 		text.UpdatedAt,
 	).Scan(&text.ID)
