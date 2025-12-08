@@ -7,8 +7,8 @@ import (
 // ReadingText presents the text to check the reading speed
 type ReadingText struct {
 	ID        int64     `json:"id" db:"id"`
-	Content   string    `json:"content" db:"content"`
-	WordCount int       `json:"word_count" db:"word_count" binding:"required"`
+	Content   string    `json:"content" db:"content" binding:"required"`
+	WordCount int       `json:"word_count" db:"word_count" `
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
