@@ -21,12 +21,6 @@ func (h *Handler) createReadingText(c *gin.Context) {
 		return
 	}
 
-	// Validate that content is not empty
-	if readingText.Content == "" {
-		h.errorHandler.BadRequest(c, "empty_content", "Text content cannot be empty")
-		return
-	}
-
 	// Create context with timeout for database operation
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 15*time.Second)
 	defer cancel()
