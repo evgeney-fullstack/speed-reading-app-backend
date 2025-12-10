@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	readingTextsTable     = "reading_texts"     // Database table name for reading_texts
-	readingQuestionsTable = "reading_questions" // Database table name for reading_questions
+	readingTextsTable = "reading_texts" // Database table name for reading_texts
 )
 
 // Config holds PostgreSQL connection configuration parameters

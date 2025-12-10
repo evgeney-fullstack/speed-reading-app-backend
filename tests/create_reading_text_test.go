@@ -145,7 +145,7 @@ func TestCreateReadingTextIntegration(t *testing.T) {
 				},
 			},
 			contextTimeout: 100 * time.Millisecond,
-			expectedStatus: http.StatusBadRequest,
+			expectedStatus: http.StatusRequestTimeout,
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				assert.Contains(t, recorder.Body.String(), "request_timeout", "Operation timed out")
 			},
