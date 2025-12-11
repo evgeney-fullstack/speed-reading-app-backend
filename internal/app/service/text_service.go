@@ -21,9 +21,9 @@ func NewTextService(repo postgres.TextRepoStore) *TextService {
 
 // CreateReadingText implements reading text creation business logic (to be implemented)
 func (s *TextService) CreateReadingText(ctx context.Context, text models.ReadingText) (int64, error) {
-	// Checking if the context has already been canceled.
+	// Check if context is still valid before proceeding
 	if err := ctx.Err(); err != nil {
-		return 0, fmt.Errorf("context cancelled before operation: %w", err)
+		return 0, fmt.Errorf("context error before repository call: %w", err)
 	}
 
 	// Split by whitespace and filter out empty strings
@@ -32,14 +32,23 @@ func (s *TextService) CreateReadingText(ctx context.Context, text models.Reading
 	return s.repo.InsertText(ctx, text)
 }
 
-// GetAll implements business logic for retrieving all reading texts (to be implemented)
-func (s *TextService) GetAll() {
+// GetReadingText retrieves a reading text by ID from the repository
+// Performs business logic validation and error handling
+func (s *TextService) GetReadingText(ctx context.Context, textID int64) (models.ReadingText, error) {
 
-}
+	// Check if context is still valid before proceeding
+	if err := ctx.Err(); err != nil {
+		return models.ReadingText{}, fmt.Errorf("context error before repository call: %w", err)
+	}
 
-// GetById implements business logic for retrieving reading text by ID (to be implemented)
-func (s *TextService) GetById() {
+	// Retrieve reading text by ID from the repository layer (database)
+	text, err := s.repo.GetTextById(ctx, textID)
+	if err != nil {
+		// Wrap repository error with service layer context
+		return models.ReadingText{}, fmt.Errorf("failed to retrieve reading text with ID %d: %w", textID, err)
+	}
 
+	return text, nil
 }
 
 // Delete implements reading text deletion business logic (to be implemented)

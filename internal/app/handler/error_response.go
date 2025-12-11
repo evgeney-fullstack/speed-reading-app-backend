@@ -100,6 +100,16 @@ func (h *ErrorHandler) Unauthorized(c *gin.Context, code, message string) {
 	})
 }
 
+// RequestTimeout handles timed out errors (HTTP 408).
+func (h *ErrorHandler) RequestTimeout(c *gin.Context, code, message string) {
+	h.logError(c, http.StatusRequestTimeout, code, message, nil)
+
+	c.AbortWithStatusJSON(http.StatusRequestTimeout, ErrorResponse{
+		Message: message,
+		Code:    code,
+	})
+}
+
 // Success returns a standardized success response with HTTP 200.
 func (h *ErrorHandler) Success(c *gin.Context, status string) {
 	c.JSON(http.StatusOK, StatusResponse{

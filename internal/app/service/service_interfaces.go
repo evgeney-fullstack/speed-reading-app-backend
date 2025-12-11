@@ -10,8 +10,7 @@ import (
 // TextServiceStore defines business logic operations for reading text
 type TextServiceStore interface {
 	CreateReadingText(ctx context.Context, text models.ReadingText) (int64, error)
-	GetAll()
-	GetById()
+	GetReadingText(ctx context.Context, textID int64) (models.ReadingText, error)
 	Delete()
 	Update()
 }

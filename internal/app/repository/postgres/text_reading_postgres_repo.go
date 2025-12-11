@@ -58,14 +58,29 @@ func (r *TextRepository) InsertText(ctx context.Context, text models.ReadingText
 	return text.ID, nil
 }
 
-// GetAll implements retrieval of all reading texts (to be implemented)
-func (r *TextRepository) GetAll() {
+// GetTextById retrieves a reading text by ID from the database
+// Returns sql.ErrNoRows if no text found with the given ID
+func (r *TextRepository) GetTextById(ctx context.Context, textID int64) (models.ReadingText, error) {
+	var text models.ReadingText
 
-}
+	// Check if context was cancelled before proceeding with database operation
+	if err := ctx.Err(); err != nil {
+		return text, fmt.Errorf("context cancelled before database query: %w", err)
+	}
 
-// GetById implements retrieval of reading text by ID (to be implemented)
-func (r *TextRepository) GetById() {
+	// Using parameterized query to prevent SQL injection
+	// readingTextsTable is a constant defined elsewhere
+	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", readingTextsTable)
 
+	// Execute the query with context for proper timeout/cancellation handling
+	err := r.db.GetContext(ctx, &text, query, textID)
+	if err != nil {
+		// Return error as-is to allow service layer to handle specific cases
+		// (e.g., sql.ErrNoRows for "not found" scenario)
+		return text, err
+	}
+
+	return text, nil
 }
 
 // Delete implements reading text deletion logic (to be implemented)

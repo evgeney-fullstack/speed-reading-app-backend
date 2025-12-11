@@ -10,8 +10,7 @@ import (
 // TextRepoStore defines CRUD operations for reading text management
 type TextRepoStore interface {
 	InsertText(ctx context.Context, text models.ReadingText) (int64, error)
-	GetAll()
-	GetById()
+	GetTextById(ctx context.Context, textID int64) (models.ReadingText, error)
 	Delete()
 	Update()
 }
