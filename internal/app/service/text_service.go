@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/evgeney-fullstack/speed-reading-app-backend/internal/app/apperrors"
 	"github.com/evgeney-fullstack/speed-reading-app-backend/internal/app/models"
 	"github.com/evgeney-fullstack/speed-reading-app-backend/internal/app/repository/postgres"
 )
@@ -51,9 +53,29 @@ func (s *TextService) GetReadingText(ctx context.Context, textID int64) (models.
 	return text, nil
 }
 
-// Delete implements reading text deletion business logic (to be implemented)
-func (s *TextService) Delete() {
+// DeleteReadingText handles business logic for deleting a reading text by ID
+// Validates input and delegates to repository layer
+func (s *TextService) DeleteReadingText(ctx context.Context, textID int64) error {
 
+	// Check if context is still valid before proceeding
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("context error before delete operation: %w", err)
+	}
+
+	// Delegate deletion to repository layer
+	err := s.repo.DeleteText(ctx, textID)
+	if err != nil {
+
+		//Service  "not found" error from repository layer
+		if errors.Is(err, apperrors.ErrTextNotFound) {
+			return apperrors.ErrTextNotFound
+		}
+
+		// Wrap repository error with service layer context
+		return fmt.Errorf("failed to delete reading text with ID %d: %w", textID, err)
+	}
+
+	return nil
 }
 
 // Update implements reading text update business logic (to be implemented)

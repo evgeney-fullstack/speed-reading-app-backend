@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/evgeney-fullstack/speed-reading-app-backend/internal/app/apperrors"
 	"github.com/evgeney-fullstack/speed-reading-app-backend/internal/app/models"
 	"github.com/gin-gonic/gin"
 )
@@ -92,6 +93,47 @@ func (h *Handler) updateReadingText(c *gin.Context) {
 
 }
 
+// DeleteReadingText removes a reading text by its ID
+// DELETE /reading_text/:text_id
 func (h *Handler) deleteReadingText(c *gin.Context) {
+	// Extract and convert text_id parameter from URL path to integer
+	textID, err := strconv.Atoi(c.Param("text_id"))
+	if err != nil {
+		// Return 400 Bad Request if the parameter is not a valid integer
+		h.errorHandler.BadRequest(c, "invalid_text_id_param", "Invalid text ID format")
+		return
+	}
 
+	// Validate for positive ID value
+	if textID <= 0 {
+		h.errorHandler.BadRequest(c, "invalid_text_id_value", "Text ID must be positive")
+		return
+	}
+
+	// Create context with timeout for database operation
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 15*time.Second)
+	defer cancel()
+
+	// Delete the reading text from the service layer
+	err = h.services.TextServiceStore.DeleteReadingText(ctx, int64(textID))
+	if err != nil {
+		// Check for context timeout
+		if errors.Is(err, context.DeadlineExceeded) {
+			h.errorHandler.RequestTimeout(c, "request_timeout", "Operation timed out")
+			return
+		}
+
+		// Handle "not found" error from service layer
+		if errors.Is(err, apperrors.ErrTextNotFound) {
+			h.errorHandler.NotFound(c, "Text not found")
+			return
+		}
+
+		// Log internal error details but return generic message to client
+		h.errorHandler.InternalError(c, err, "Failed to delete reading text")
+		return
+	}
+
+	// Return HTTP 204 OK with success confirmation
+	c.Status(http.StatusNoContent)
 }
