@@ -11,7 +11,7 @@ import (
 type TextRepoStore interface {
 	InsertText(ctx context.Context, text models.ReadingText) (int64, error)
 	GetTextById(ctx context.Context, textID int64) (models.ReadingText, error)
-	Delete()
+	DeleteText(ctx context.Context, textID int64) error
 	Update()
 }
 

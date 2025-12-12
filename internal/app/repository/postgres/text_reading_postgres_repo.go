@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/evgeney-fullstack/speed-reading-app-backend/internal/app/apperrors"
 	"github.com/evgeney-fullstack/speed-reading-app-backend/internal/app/models"
 	"github.com/jmoiron/sqlx"
 )
@@ -83,9 +84,34 @@ func (r *TextRepository) GetTextById(ctx context.Context, textID int64) (models.
 	return text, nil
 }
 
-// Delete implements reading text deletion logic (to be implemented)
-func (r *TextRepository) Delete() {
+// DeleteText removes a reading text by ID from the database
+// Returns an error if the text is not found or if operation fails
+func (r *TextRepository) DeleteText(ctx context.Context, textID int64) error {
+	// Check if context was cancelled before proceeding
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("context cancelled before delete operation: %w", err)
+	}
 
+	// Using parameterized query to prevent SQL injection
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", readingTextsTable)
+
+	// Execute the delete operation
+	result, err := r.db.ExecContext(ctx, query, textID)
+	if err != nil {
+		return fmt.Errorf("database error during delete: %w", err)
+	}
+
+	// Check if any row was actually deleted
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("%w: text with ID %d not found", apperrors.ErrTextNotFound, textID)
+	}
+
+	return nil
 }
 
 // Update implements reading text update logic (to be implemented)

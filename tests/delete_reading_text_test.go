@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestgetReadingTextByIdIntegration is testing the endpoint of get a reading text
-func TestGetReadingTextByIdIntegration(t *testing.T) {
+// TestDeleteReadingTextIntegration is testing the endpoint of delete a reading text
+func TestDeleteReadingTextIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration tests in short mode")
 	}
@@ -75,12 +75,12 @@ func TestGetReadingTextByIdIntegration(t *testing.T) {
 			},
 		},
 		{
-			name:           "Successful get reading text by id",
+			name:           "Successful delete a reading text by id",
 			parameter:      "1",
 			contextTimeout: 15 * time.Second,
-			expectedStatus: http.StatusOK,
+			expectedStatus: http.StatusNoContent,
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				assert.Contains(t, recorder.Body.String(), "test test test test.")
+				assert.Contains(t, recorder.Body.String(), "")
 			},
 		},
 		{
@@ -89,7 +89,7 @@ func TestGetReadingTextByIdIntegration(t *testing.T) {
 			contextTimeout: 15 * time.Second,
 			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				assert.Contains(t, recorder.Body.String(), "Invalid request param format")
+				assert.Contains(t, recorder.Body.String(), "Invalid text ID format")
 			},
 		},
 		{
@@ -108,6 +108,16 @@ func TestGetReadingTextByIdIntegration(t *testing.T) {
 			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				assert.Contains(t, recorder.Body.String(), "Text ID must be positive")
+			},
+		},
+
+		{
+			name:           "Error - text not found",
+			parameter:      "1",
+			contextTimeout: 15 * time.Second,
+			expectedStatus: http.StatusNotFound,
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				assert.Contains(t, recorder.Body.String(), "Text not found")
 			},
 		},
 	}
@@ -143,7 +153,7 @@ func TestGetReadingTextByIdIntegration(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Request preparation
 			body, _ := json.Marshal(tt.payload)
-			req, _ := http.NewRequest("GET", fmt.Sprintf("/reading_text/%s", tt.parameter), bytes.NewBuffer(body))
+			req, _ := http.NewRequest("DELETE", fmt.Sprintf("/reading_text/%s", tt.parameter), bytes.NewBuffer(body))
 			req.Header.Set("Content-Type", "application/json")
 
 			// Setting the context with timeout
