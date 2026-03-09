@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/evgeney-fullstack/speed-reading-app-backend/internal/app/apperrors"
@@ -115,6 +116,46 @@ func (r *TextRepository) DeleteText(ctx context.Context, textID int64) error {
 }
 
 // Update implements reading text update logic (to be implemented)
-func (r *TextRepository) Update() {
+func (r *TextRepository) UpdateText(ctx context.Context, textID int64, input *models.UpdateReadingText) error {
 
+	// Initialize slices for building dynamic SET clause and arguments
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1 // Positional parameter counter
+
+	// Handle price update if provided
+	if input.Content != nil {
+		setValues = append(setValues, fmt.Sprintf("content=$%d", argId))
+		args = append(args, *input.Content)
+		argId++
+
+		setValues = append(setValues, fmt.Sprintf("word_count=$%d", argId))
+		args = append(args, input.WordCount)
+		argId++
+	}
+
+	// Handle start date update if provided
+	if input.Questions != nil {
+		setValues = append(setValues, fmt.Sprintf("questions=$%d", argId))
+		args = append(args, *input.Questions)
+		argId++
+	}
+
+	updatedAt := time.Now().UTC()
+	setValues = append(setValues, fmt.Sprintf("updated_at=$%d", argId))
+	args = append(args, updatedAt)
+	argId++
+
+	// Join SET clauses with commas
+	setQuery := strings.Join(setValues, ", ")
+
+	// Build final SQL query with WHERE clause
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d", readingTextsTable, setQuery, argId)
+
+	// Add subscription ID as the last parameter
+	args = append(args, textID)
+
+	// Execute the query
+	_, err := r.db.Exec(query, args...)
+	return err
 }

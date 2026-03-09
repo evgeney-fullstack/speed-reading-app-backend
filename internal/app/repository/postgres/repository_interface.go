@@ -12,7 +12,7 @@ type TextRepoStore interface {
 	InsertText(ctx context.Context, text models.ReadingText) (int64, error)
 	GetTextById(ctx context.Context, textID int64) (models.ReadingText, error)
 	DeleteText(ctx context.Context, textID int64) error
-	Update()
+	UpdateText(ctx context.Context, textID int64, input *models.UpdateReadingText) error
 }
 
 // Repository aggregates all store interfaces for database operations

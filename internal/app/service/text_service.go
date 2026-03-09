@@ -78,7 +78,33 @@ func (s *TextService) DeleteReadingText(ctx context.Context, textID int64) error
 	return nil
 }
 
-// Update implements reading text update business logic (to be implemented)
-func (s *TextService) Update() {
+// UpdateReadingText implements business logic for partially updating a reading text.
+// It accepts an UpdateReadingText struct with optional fields.
+// Only fields that are provided (non-nil) will be updated.
+// If Content is provided, WordCount is recalculated automatically.
+// Returns apperrors.ErrTextNotFound if the text does not exist.
+func (s *TextService) UpdateReadingText(ctx context.Context, textID int64, input models.UpdateReadingText) error {
+	// Check if context is still valid before proceeding
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("context error before update operation: %w", err)
+	}
 
+	if input.Content != nil {
+		// Split by whitespace and filter out empty strings
+		input.WordCount = len(strings.Fields(*input.Content))
+	}
+
+	// Delegate partial update to repository layer
+	err := s.repo.UpdateText(ctx, textID, &input)
+	if err != nil {
+		// Propagate "not found" error from repository layer
+		if errors.Is(err, apperrors.ErrTextNotFound) {
+			return apperrors.ErrTextNotFound
+		}
+
+		// Wrap repository error with service layer context
+		return fmt.Errorf("failed to update reading text with ID %d: %w", textID, err)
+	}
+
+	return nil
 }

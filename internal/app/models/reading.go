@@ -17,6 +17,13 @@ type ReadingText struct {
 	UpdatedAt time.Time    `json:"updated_at" db:"updated_at"`
 }
 
+// UpdateReadingText presents the text to check the reading speed
+type UpdateReadingText struct {
+	Content   *string       `json:"content"`
+	WordCount int           `db:"word_count"`
+	Questions *QuestionList `json:"questions"`
+}
+
 // Question presents a question to the text
 type Question struct {
 	ID       int64  `json:"id,omitempty"`
