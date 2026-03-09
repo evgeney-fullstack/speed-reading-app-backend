@@ -37,13 +37,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		speedReading.PUT("/:text_id", h.updateReadingText)    //Update an existing reading text
 		speedReading.DELETE("/:text_id", h.deleteReadingText) //Delete a reading text
 
-		questions := speedReading.Group("/:text_id/questions")
-		{
-			questions.POST("/", h.createQuestion)               //Create a new question
-			questions.GET("/", h.getAllQuestion)                //Retrieve all question
-			questions.PUT("/:question_id", h.updateQuestion)    //Update an existing question
-			questions.DELETE("/:question_id", h.deleteQuestion) //Delete a question
-		}
 	}
 
 	return router
