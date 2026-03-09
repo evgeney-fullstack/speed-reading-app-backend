@@ -12,7 +12,7 @@ type TextServiceStore interface {
 	CreateReadingText(ctx context.Context, text models.ReadingText) (int64, error)
 	GetReadingText(ctx context.Context, textID int64) (models.ReadingText, error)
 	DeleteReadingText(ctx context.Context, textID int64) error
-	Update()
+	UpdateReadingText(ctx context.Context, textID int64, input models.UpdateReadingText) error
 }
 
 // Service layer aggregates all business logic services
